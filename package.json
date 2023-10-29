@@ -1,7 +1,7 @@
 {
-  "name": "api-koa2-ecpress",
+  "name": "api-koa2-express",
   "version": "1.0.0",
-  "description": "",
+  "description": "```cmd\r npm init -y\r ```",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
