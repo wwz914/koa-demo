@@ -1,11 +1,7 @@
-const Koa=require('koa')
+const app=require('./app')
 
 const {APP_PORT}=require('./config/config.default')
 
-// 创建服务
-const app=new Koa()
-
-// 中间件
 app.use((ctx,next)=>{
     ctx.body='hello world'
 })
