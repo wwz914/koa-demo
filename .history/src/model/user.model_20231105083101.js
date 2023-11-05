@@ -1,0 +1,2 @@
+const {DataType}=require('sequelize')
+
