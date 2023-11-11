@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs')
 const {getUserInfo}=require('../service/user.service')
 const {userExitErr,userFormatErr,userRegisterErr}=require('../constants/err.type')
 const userValidator=async(ctx,next)=>{
@@ -13,12 +14,6 @@ const userValidator=async(ctx,next)=>{
 
 const verifyUser=async(ctx,next)=>{
     const {user_name}=ctx.request.body
-    // 合理性
-    // console.log('已存在',await getUserInfo({user_name}));
-    // if(await getUserInfo({user_name})){
-    //     ctx.app.emit('error',userExitErr,ctx)
-    //     return
-    // }
     try{
         const res=await getUserInfo({user_name})
         if(res){
@@ -33,4 +28,14 @@ const verifyUser=async(ctx,next)=>{
     }
     await next()
 }
-module.exports={userValidator,verifyUser}
+
+const crpyPassword=async(ctx,next)=>{
+    const {password}=ctx.request.body
+
+    const salt = bcrypt.genSaltSync(10);
+    // hash保存的是密文
+    const hash = bcrypt.hashSync(password, salt);
+    ctx.request.body.password=hash
+    await next()
+}
+module.exports={userValidator,verifyUser,crpyPassword}
