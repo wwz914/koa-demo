@@ -2,6 +2,7 @@
 const Koa=require('koa')
 const {koaBody}=require('koa-body')
 
+const errHandler=require('./errHandler')
 // 创建服务
 const app=new Koa()
 
@@ -11,4 +12,6 @@ const userRouter=require('../router/user.route')
 
 app.use(userRouter.routes())
 
+// 统一的错误处理
+app.on('error',errHandler)
 module.exports=app
