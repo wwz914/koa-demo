@@ -401,6 +401,8 @@ module.exports=User
 
 ## 九.添加用户入库
 
+所有数据库的操作都在`Service`层完成，`Service`调用`Model`完成数据库操作
+
 改写`user.service.js`
 
 ```
@@ -494,14 +496,184 @@ async getUserInfo({id,user_name,password,is_admin}){
 
 在`错误处理`的基础上优化代码结构
 
-### 1 抽离文件夹`middleware`
+### 1 拆分中间件
 
-在文件夹中新建各模块中间件
+建立constants和errHandler.js
+
+constants：存放各种错误返回类型
+
+- err.type.js(constants文件夹下)：
+
+```javascript
+// 定义错误类型
+module.exports={
+    userFormatErr:{
+        code:'10001',
+        message:'用户名或密码为空',
+        result:''
+    },
+    userExitErr:{
+        code:'10002',
+        message:'用户已经存在',
+        result:''
+    },
+    userRegisterErr:{
+        code:'10003',
+        message:'用户注册错误',
+        result:''
+    }
+}
+```
+
+- errHandler.js：错误处理函数，返回添加响应状态码
+
+```javascript
+module.exports=(err,ctx)=>{
+    let status=500
+    switch(err.code){
+        case '10001':
+            status=400
+        break
+        case '10002':
+            status=409
+        break
+        default:
+            status=500
+    }
+    ctx.status=status
+    ctx.body=err
+}
+```
+
+### 2 统一错误处理
+
+在`user.middleware.js`中提交错误处理
+
+```javascript
+ ctx.app.emit('error',userExitErr,ctx)
+```
+
+在`app/index.js`中统一接收错误处理事件
+
+```javascript
+const errHandler=require('./errHandler')
+app.on('error',errHandler)
+```
+
+### 3 错误处理函数
+
+某些错误处理事件会发生独立性错误，需采用try-catch写法
+
+```javascript
+const verifyUser=async(ctx,next)=>{
+    const {user_name}=ctx.request.body
+    try{
+        const res=await getUserInfo({user_name})
+        if(res){
+            console.error('用户名已存在',{user_name});
+            ctx.app.emit('error',userExitErr,ctx)
+            return//阻止下一个中间件执行
+        }
+    }catch(err){
+        console.error('获取用户信息错误',err);
+        ctx.app.emit('error',userRegisterErr,ctx)
+        return
+    }
+    await next()
+}
+```
+
+## 十二.加密
+
+将密码保存到数据库前，对其进行加密
+
+### 1 安装bcryptjs
 
 ```
+npm install bcryptjs
 ```
 
+### 2 编写加密中间件
+
+```javascript
+const crpyPassword=async(ctx,next)=>{
+    const {password}=ctx.request.body
+
+    const salt = bcrypt.genSaltSync(10);
+    // hash保存的是密文
+    const hash = bcrypt.hashSync(password, salt);
+    ctx.request.body.password=hash
+    await next()
+}//写完记得导出
+```
+
+### 3 在`route`中使用
+
+```javascript
+const {userValidator,verifyUser,crpyPassword}=require('../middleware/user.middleware')
+router.post('/register',userValidator,verifyUser,crpyPassword,register)
+```
+
+阶段总结：
 
 
 
+## 十三.登陆验证
+
+- 登录校验中间件
+
+```javascript
+const verifyLogin=async(ctx,next)=>{
+    const {user_name,password}=ctx.request.body
+    try{
+        const res=await getUserInfo({user_name})
+        if(!res){
+            console.error('用户不存在',user_name);
+            ctx.app.emit('error',userNotExitErr,ctx)
+            return
+        }
+        if(!bcrypt.compareSync(password, res.password)){
+            ctx.app.emit('error',invalidPwdErr,ctx)
+            return
+        }
+    }catch(err){
+        console.error('用户登录失败',err);
+        ctx.app.emit('error',userLoginErr,ctx)
+        return
+    }
+    await next()
+}
+```
+
+- 登录处理函数
+
+```javascript
+async login(ctx,next) {
+        const {user_name,password}=ctx.request.body
+        // ctx.body=`用户登陆成功，${user_name}`
+        ctx.body={
+            code:0,
+            message:'用户登录成功',
+            result:{
+                user_name
+            }
+        }
+    }
+```
+
+## 十四.用户认证
+
+登录成功后颁发token
+
+jwt:jsonwebtoken
+
+- header：头部
+- payload：负载
+- signiture：签名
+
+### 1 安装jsonwebtoken
+
+```
+npm install jsonwebtoken
+```
 

@@ -1,6 +1,13 @@
 const bcrypt = require('bcryptjs')
 const {getUserInfo}=require('../service/user.service')
-const {userExitErr,userFormatErr,userRegisterErr}=require('../constants/err.type')
+const { userExitErr,
+        userFormatErr,
+        userRegisterErr,
+        userNotExitErr,
+        userLoginErr,
+        invalidPwdErr
+}=require('../constants/err.type')
+// 注册输入信息完整性校验中间件
 const userValidator=async(ctx,next)=>{
     const {user_name,password}=ctx.request.body
     // 合法性
@@ -11,7 +18,7 @@ const userValidator=async(ctx,next)=>{
     }
     await next()
 }
-
+// 注册查重中间件
 const verifyUser=async(ctx,next)=>{
     const {user_name}=ctx.request.body
     try{
@@ -28,7 +35,7 @@ const verifyUser=async(ctx,next)=>{
     }
     await next()
 }
-
+// 密码加密中间件
 const crpyPassword=async(ctx,next)=>{
     const {password}=ctx.request.body
 
@@ -38,4 +45,29 @@ const crpyPassword=async(ctx,next)=>{
     ctx.request.body.password=hash
     await next()
 }
-module.exports={userValidator,verifyUser,crpyPassword}
+// 验证登录中间件
+const verifyLogin=async(ctx,next)=>{
+    const {user_name,password}=ctx.request.body
+    try{
+        const res=await getUserInfo({user_name})
+        if(!res){
+            console.error('用户不存在',user_name);
+            ctx.app.emit('error',userNotExitErr,ctx)
+            return
+        }
+        if(!bcrypt.compareSync(password, res.password)){
+            ctx.app.emit('error',invalidPwdErr,ctx)
+            return
+        }
+    }catch(err){
+        console.error('用户登录失败',err);
+        ctx.app.emit('error',userLoginErr,ctx)
+        return
+    }
+    await next()
+}
+module.exports={userValidator,
+                verifyUser,
+                crpyPassword,
+                verifyLogin
+}
