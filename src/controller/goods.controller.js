@@ -1,5 +1,6 @@
 const path=require('path')
-const {uploadImgErr,uploadFileTypeErr}=require('../constants/err.type');
+const {createGood}=require('../service/goods.service')
+const {uploadImgErr,uploadFileTypeErr,goodPubErr}=require('../constants/err.type');
 class GoodsController{
     async upload(ctx,next){
         const {file}=ctx.request.files
@@ -20,6 +21,22 @@ class GoodsController{
         }else{
             return ctx.app.emit('error',uploadImgErr,ctx)
         }
+    }
+
+    async publishGoods(ctx,next){
+        // 调用sevice
+        try{
+            const {updatedAt,createdAt,...res}=await createGood(ctx.request.body)
+            ctx.body={
+                code:0,
+                message:'商品发布成功',
+                result:res
+            }
+        }catch(err){
+            console.error(err);
+            return ctx.app.emit('error',goodPubErr,ctx)
+        }
+        
     }
 }
 

@@ -1,9 +1,7 @@
-const { error, log } = require('console')
 const jwt=require('jsonwebtoken')
 const {JWT_SECRET}=require('../config/config.default')
 const {createUser,getUserInfo,updateById}=require('../service/user.service')
 const {userRegisterErr}=require('../constants/err.type')
-const { request } = require('http')
 class UserController{
     async register(ctx,next){
         // 1.获取数据

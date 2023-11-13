@@ -3,9 +3,12 @@ const Koa=require('koa')
 const path=require('path')
 const {koaBody}=require('koa-body')
 const KoaStatic=require('koa-static')
+const parameper=require('koa-parameter')
 const errHandler=require('./errHandler')
 // 创建服务
 const app=new Koa()
+// 使用参数校验插件
+parameper(app)
 
 app.use(koaBody({
     // 以下为上传图片的需要声明的option

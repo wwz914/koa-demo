@@ -54,5 +54,15 @@ module.exports={
         code:'10202',
         message:'文件上传类型错误',
         result:''
+    },
+    goodsParamErr:{
+        code:'10203',
+        message:'商品参数错误',
+        result:''
+    },
+    goodPubErr:{
+        code:'10204',
+        message:'商品上传错误',
+        result:''
     }
 }
