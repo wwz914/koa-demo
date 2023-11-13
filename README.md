@@ -661,7 +661,7 @@ async login(ctx,next) {
     }
 ```
 
-## 十四.用户认证
+## 十四.用户的认证
 
 登录成功后颁发token
 
@@ -671,9 +671,162 @@ jwt:jsonwebtoken
 - payload：负载
 - signiture：签名
 
-### 1 安装jsonwebtoken
+### 1 颁发token
+
+#### 1） 安装jsonwebtoken
 
 ```
 npm install jsonwebtoken
+```
+
+#### 2）在控制器中改写login方法
+
+```javascript
+async login(ctx,next) {
+        const {user_name,password}=ctx.request.body
+        // token的payload需要获取用户信息
+        try{
+            // 获取除密码之外的所有信息
+            const {password,...restUser}=await getUserInfo({user_name})
+            ctx.body={
+                code:0,
+                message:'用户登录成功',
+                result:{
+                    token:jwt.sign(restUser,JWT_SECRET,{expiresIn:'2d'}),
+                }
+            }
+
+        }catch(err){
+            console.error('用户登陆失败',err);
+        }
+    }
+```
+
+#### 3）定义私钥
+
+![image-20231112125553262](C:\Users\32629\AppData\Roaming\Typora\typora-user-images\image-20231112125553262.png)
+
+### 2 用户认证
+
+#### 1）改写auth中间件
+
+```javascript
+const jwt=require('jsonwebtoken')
+const {JWT_SECRET}=require('../config/config.default')
+const {tokenExpiresErr,invalidTokenErr}=require('../constants/err.type')
+const auth=async(ctx,next)=>{
+    // 获取token
+    const {authorization}=ctx.request.header
+    const token=authorization.replace('Bearer ','')
+    // console.log(token);
+    try{
+        const user=jwt.verify(token,JWT_SECRET)
+        ctx.state.user=user
+    }catch(err){
+        switch(err.name){
+            case 'TokenExpiredError':
+                console.error('token已过期',err);
+                return ctx.app.emit('error',tokenExpiresErr,ctx)
+            case 'JsonWebTokenError':
+                console.error('无效的token',invalidTokenErr);
+                return ctx.app.emit('error',invalidTokenErr,ctx)
+        }
+    }
+    await next()
+}
+
+module.exports={
+    auth
+}
+```
+
+#### 2）改写router
+
+![image-20231112130230954](C:\Users\32629\AppData\Roaming\Typora\typora-user-images\image-20231112130230954.png)
+
+## 十五.路由自动加载
+
+### 1 在`router`文件夹中添加`index.js`
+
+`index.js`
+
+```javascript
+const fs=require('fs')
+
+const Router=require('koa-router')
+const router=new Router()
+fs.readdirSync(__dirname).forEach(file=>{
+    // console.log(file);
+    if(file!='index.js'){
+        let r=require('./'+file)
+        router.use(r.routes())
+    }
+})
+
+// 导出
+module.exports=router
+```
+
+### 2 改写`app/index.js`中的路由注册方式
+
+PS：`allowedMethods()`用于限制请求发送类型
+
+```javascript
+const router=require('../router/index')
+app.use(router.routes()).use(router.allowedMethods())
+```
+
+## 十六.封装管理员权限
+
+在`auth.middleware.js`中添加授权中间件
+
+```javascript
+const hasAdminPermission=async(ctx,next)=>{
+    const {is_admin}=ctx.state.user
+
+    if(!is_admin){
+        console.error('该用户没有管理员权限');
+        return ctx.app.emit('error',noAdminPermissionErr,ctx)
+    }
+
+    await next()
+}
+```
+
+## 十七.上传图片
+
+### 1 添加koa-body的option
+
+```javascript
+app.use(koaBody({
+    // 以下为上传图片的需要声明的option
+    multipart:true,
+    formidable:{
+        // 在option中尽量使用绝对路径
+        uploadDir:path.join(__dirname,'../upload'),
+        keepExtensions:true
+    }
+}))
+```
+
+### 2 `controller`中的`upload`函数
+
+```javascript
+async upload(ctx,next){
+    const {file}=ctx.request.files
+    console.log(file);
+    if(file){
+        console.log('yeahhh');
+        ctx.body={
+            code:0,
+            message:'商品图片上传成功',
+            result:{
+                goods_img:path.basename(file.filepath),
+            }
+        }
+    }else{
+        return ctx.app.emit('error',uploadImgErr,ctx)
+    }
+}
 ```
 

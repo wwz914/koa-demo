@@ -40,4 +40,19 @@ module.exports={
         message:'无效的token',
         result:''
     },
+    noAdminPermissionErr:{
+        code:'10103',
+        message:'没有管理员权限',
+        result:''
+    },
+    uploadImgErr:{
+        code:'10201',
+        message:'商品图片上传失败',
+        result:''
+    },
+    uploadFileTypeErr:{
+        code:'10202',
+        message:'文件上传类型错误',
+        result:''
+    }
 }

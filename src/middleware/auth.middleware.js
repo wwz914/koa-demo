@@ -1,6 +1,10 @@
 const jwt=require('jsonwebtoken')
 const {JWT_SECRET}=require('../config/config.default')
-const {tokenExpiresErr,invalidTokenErr}=require('../constants/err.type')
+const { tokenExpiresErr,
+        invalidTokenErr,
+        noAdminPermissionErr
+}=require('../constants/err.type')
+// 认证
 const auth=async(ctx,next)=>{
     // 获取token
     const {authorization}=ctx.request.header
@@ -21,7 +25,18 @@ const auth=async(ctx,next)=>{
     }
     await next()
 }
+// 授权
+const hasAdminPermission=async(ctx,next)=>{
+    const {is_admin}=ctx.state.user
+
+    if(!is_admin){
+        console.error('该用户没有管理员权限');
+        return ctx.app.emit('error',noAdminPermissionErr,ctx)
+    }
+
+    await next()
+}
 
 module.exports={
-    auth
+    auth,hasAdminPermission
 }
