@@ -24,7 +24,7 @@ const Goods=seq.define('zd_goods',{
         allowNull:false,
         comment:'商品图片'
     },
-    deleteAt:{
+    deletedAt:{
         type:DataTypes.DATE,
         comment:'下架时间'
     }

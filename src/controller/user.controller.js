@@ -5,11 +5,11 @@ const {userRegisterErr}=require('../constants/err.type')
 class UserController{
     async register(ctx,next){
         // 1.获取数据
-        const {user_name,password}=ctx.request.body
+        const {user_name,password,is_admin}=ctx.request.body
     
         // 2.操作数据库
         try{
-            const res=await createUser(user_name,password)
+            const res=await createUser(user_name,password,is_admin)
             // 3.返回结果
             ctx.body={
                 code:0,
@@ -26,7 +26,7 @@ class UserController{
     }
 
     async login(ctx,next) {
-        const {user_name,password}=ctx.request.body
+        const {user_name}=ctx.request.body
         // token的payload需要获取用户信息
         try{
             // 获取除密码之外的所有信息

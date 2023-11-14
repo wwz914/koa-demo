@@ -74,5 +74,10 @@ module.exports={
         code:'10206',
         message:'商品下架失败',
         result:''
+    },
+    goodGetErr:{
+        code:'10207',
+        message:'商品获取失败',
+        result:''
     }
 }

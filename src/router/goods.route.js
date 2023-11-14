@@ -1,7 +1,7 @@
 const Router=require('koa-router')
 
 const {auth,hasAdminPermission,validator}=require('../middleware/auth.middleware')
-const {upload,publishGoods,updateGoods,remove,restore}=require('../controller/goods.controller')
+const {upload,publishGoods,updateGoods,remove,restore,findAll}=require('../controller/goods.controller')
 
 const router=new Router({prefix:'/goods'})
 
@@ -19,5 +19,8 @@ router.post('/:id/off',auth,hasAdminPermission,remove)
 
 // 上架商品接口
 router.post('/:id/on',auth,hasAdminPermission,restore)
+
+// 查询所有商品接口
+router.get('/',findAll)
 
 module.exports=router

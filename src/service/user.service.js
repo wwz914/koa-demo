@@ -1,9 +1,9 @@
 const User=require('../model/user.model')
 
 class UserService{
-    async createUser(user_name,password){
+    async createUser(user_name,password,is_admin){
         // todo:写入数据库
-        const res=await User.create({user_name,password})
+        const res=await User.create({user_name,password,is_admin})
         return res.dataValues
     }
 
