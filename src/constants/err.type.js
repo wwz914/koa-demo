@@ -64,5 +64,15 @@ module.exports={
         code:'10204',
         message:'商品上传错误',
         result:''
+    },
+    goodRemoveErr:{
+        code:'10205',
+        message:'商品下架失败',
+        result:''
+    },
+    goodRestoreErr:{
+        code:'10206',
+        message:'商品下架失败',
+        result:''
     }
 }

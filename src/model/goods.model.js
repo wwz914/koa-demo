@@ -24,6 +24,12 @@ const Goods=seq.define('zd_goods',{
         allowNull:false,
         comment:'商品图片'
     },
+    deleteAt:{
+        type:DataTypes.DATE,
+        comment:'下架时间'
+    }
+},{
+    paranoid:true
 })
 // Goods.sync({force:true})
 
