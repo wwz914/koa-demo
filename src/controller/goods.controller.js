@@ -1,7 +1,6 @@
 const path=require('path')
 const {createGood,updateGood,reomveGoods,restoreGoods,getGoods}=require('../service/goods.service')
 const {uploadImgErr,uploadFileTypeErr,goodPubErr,goodRemoveErr,goodRestoreErr,goodGetErr}=require('../constants/err.type');
-const { log } = require('console');
 class GoodsController{
     async upload(ctx,next){
         const {file}=ctx.request.files

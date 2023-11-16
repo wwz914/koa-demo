@@ -79,5 +79,35 @@ module.exports={
         code:'10207',
         message:'商品获取失败',
         result:''
+    },
+    cartsAddErr:{
+        code:'10301',
+        message:'加入购物车失败',
+        result:''
+    },
+    cartsGetErr:{
+        code:'10302',
+        message:'购物车获取失败',
+        result:''
+    },
+    cartsEditErr:{
+        code:'10303',
+        message:'购物车更新失败',
+        result:''
+    },
+    cartsDeleteErr:{
+        code:'10304',
+        message:'购物车删除失败',
+        result:''
+    },
+    selectAllErr:{
+        code:'10305',
+        message:'购物车全选失败',
+        result:''
+    },
+    unSelectAllErr:{
+        code:'10306',
+        message:'购物车取消全选失败',
+        result:''
     }
 }

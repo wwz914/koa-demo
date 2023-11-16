@@ -13,6 +13,7 @@ parameper(app)
 app.use(koaBody({
     // 以下为上传图片的需要声明的option
     multipart:true,
+    parsedMethods:['POST', 'PUT', 'PATCH','DELETE'],
     formidable:{
         // 在option中尽量使用绝对路径
         uploadDir:path.join(__dirname,'../upload'),

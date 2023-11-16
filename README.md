@@ -830,3 +830,159 @@ async upload(ctx,next){
 }
 ```
 
+## 十八.发布商品
+
+- `route`层
+
+  ```javascript
+  router.post('/',auth,hasAdminPermission,validator,publishGoods) 
+  ```
+
+- `controller`层
+
+  ```javascript
+  async publishGoods(ctx,next){
+      // 调用sevice
+      try{
+          const {updatedAt,createdAt,...res}=await createGood(ctx.request.body)
+          ctx.body={
+              code:0,
+              message:'商品发布成功',
+              result:res
+          }
+      }catch(err){
+          console.error(err);
+          return ctx.app.emit('error',goodPubErr,ctx)
+      }
+  }
+  ```
+
+- `service`层
+
+  ```javascript
+  async createGood(good){
+      const res=await Goods.create(good)
+      console.log('创建商品成功');
+      return res.dataValues
+  }
+  ```
+
+## 十九.修改商品
+
+- `route`层
+
+  ```javascript
+  router.put('/:id',auth,hasAdminPermission,validator,updateGoods)
+  ```
+
+- `controller`层
+
+  ```javascript
+  async updateGoods(ctx){
+      try{
+          const res=await updateGood(ctx.request.body,ctx.params.id)
+          ctx.body={
+              code:0,
+              message:'修改成功',
+              result:''
+          }
+      }catch(err){
+          console.error(err);
+          return ctx.app.emit('error',goodUpdateErr,ctx)
+      }
+  }
+  ```
+
+- `service`层
+
+  ```javascript
+  async updateGood(good,id){
+      const res=await Goods.update(good,{where:{id}})
+      return res[0]>0?true:false
+  }
+  ```
+
+## 二十.下架商品
+
+- `route`层
+
+  ```javascript
+  router.post('/:id/off',auth,hasAdminPermission,remove)
+  ```
+
+- `controller`层
+
+  ```javascript
+  async remove(ctx){
+      const res=await reomveGoods(ctx.params.id)
+      if(res){
+          ctx.body={
+              code:0,
+              message:'下架成功',
+              result:''
+          }
+      }else{
+          return ctx.app.emit('error',goodRemoveErr,ctx)
+      }
+  }
+  ```
+
+- `service`层
+
+  ```javascript
+  async reomveGoods(id){
+      const res=await Goods.destroy({where:{id}})
+      return res==1?true:false
+  }
+  ```
+
+## 二十一.上架商品（略）
+
+## 二十二.获取商品列表
+
+- `route`层
+
+  ```javascript
+  router.get('/',findAll)
+  ```
+
+- `controller`层
+
+  ```javascript
+  async findAll(ctx){
+      // 1.解析pageNum和pageSize
+      const {pageNum=1,pageSize=10}=ctx.request.query
+      // 2.调用数据处理的相关方法
+      try{
+          const res=await getGoods(pageNum,pageSize)
+          // 3.返回结果
+          ctx.body={
+              code:0,
+              message:'获取商品成功',
+              result:res
+          }
+      }catch(err){
+          console.error(err);
+          return ctx.app.emit('error',goodGetErr,ctx)
+      }
+  }
+  ```
+
+- `service`层
+
+  ```javascript
+  async getGoods(pageNum,pageSize){
+      const {count,rows}=await Goods.findAndCountAll({
+          offset:(pageNum-1)*pageSize,
+          limit:pageSize*1
+      })
+      return{
+          pageNum,
+          pageSize,
+          total:count,
+          list:rows
+      }
+  }
+  ```
+
+## 二十三.
