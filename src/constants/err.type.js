@@ -109,5 +109,30 @@ module.exports={
         code:'10306',
         message:'购物车取消全选失败',
         result:''
+    },
+    addrParamsErr:{
+        code:'10401',
+        message:'地址参数错误',
+        result:''
+    },
+    addrAddErr:{
+        code:'10402',
+        message:'地址添加失败',
+        result:''
+    },
+    addrUpdateErr:{
+        code:'10403',
+        message:'地址更新失败',
+        result:''
+    },
+    addrDeleteErr:{
+        code:'10404',
+        message:'地址删除失败',
+        result:''
+    },
+    addrSetDefaultErr:{
+        code:'10405',
+        message:'设置默认地址失败',
+        result:''
     }
 }
