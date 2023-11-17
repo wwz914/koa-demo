@@ -134,5 +134,25 @@ module.exports={
         code:'10405',
         message:'设置默认地址失败',
         result:''
+    },
+    orderParamsErr:{
+        code:'10501',
+        message:'订单参数错误',
+        result:''
+    },
+    orderGenerateErr:{
+        code:'10502',
+        message:'订单生成失败',
+        result:''
+    },
+    orderGetErr:{
+        ode:'10503',
+        message:'订单获取失败',
+        result:''
+    },
+    orderUpdateErr:{
+        ode:'10504',
+        message:'订单更新失败',
+        result:''
     }
 }

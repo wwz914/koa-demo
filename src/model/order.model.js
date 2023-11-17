@@ -30,10 +30,11 @@ const Order=seq.define('zd_order',{
     status:{
         type:DataTypes.INTEGER,
         allowNull:false,
+        defaultValue:0,
         comment:'0:未支付,1:已支付,2:已收货3:已签收,4:取消'
     },
 })
 
-// Order.sync({force:true})
+// Order.sync({force:true}) 
 
-module.exports=Order
+module.exports=Order 
